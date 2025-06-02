@@ -1,3 +1,4 @@
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,8 +13,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Player & Bots")]
     public GameObject player;
-    public GameObject bot;
-    public GameObject botPrefab;
+    public GameObject bot;  
     public Transform playerSpawn;
     public Transform botSpawn;
     public Transform[] extraBotSpawns;
@@ -57,24 +57,28 @@ public class GameManager : MonoBehaviour
 
     public void Select1vs1()
     {
+        Debug.Log("Selected mode: 1 vs 1");
         selectedMode = GameMode.OneVsOne;
         StartGame();
     }
 
     public void Select1vsMany()
     {
+        Debug.Log("Selected mode: 1 vs Many");
         selectedMode = GameMode.OneVsMany;
         StartGame();
     }
 
     public void SelectManyVsMany()
     {
+        Debug.Log("Selected mode: Many vs Many");
         selectedMode = GameMode.ManyVsMany;
         StartGame();
     }
 
     private void StartGame()
     {
+        Debug.Log("Starting game with mode: " + selectedMode);
         menuUI.SetActive(false);
 
         player.SetActive(true);
@@ -88,9 +92,11 @@ public class GameManager : MonoBehaviour
         switch (selectedMode)
         {
             case GameMode.OneVsMany:
+                Debug.Log("Spawning 2 extra bots");
                 SpawnExtraBots(2);
                 break;
             case GameMode.ManyVsMany:
+                Debug.Log("Spawning 3 extra bots");
                 SpawnExtraBots(3);
                 break;
         }
@@ -102,11 +108,47 @@ public class GameManager : MonoBehaviour
 
     private void SpawnExtraBots(int count)
     {
+        Debug.Log($"SpawnExtraBots called with count = {count}");
+        if (extraBotSpawns == null || extraBotSpawns.Length == 0)
+        {
+            Debug.LogError("extraBotSpawns is empty! Please assign spawn points in Inspector.");
+            return;
+        }
+
         for (int i = 0; i < count && i < extraBotSpawns.Length; i++)
         {
-            GameObject newBot = Instantiate(botPrefab, extraBotSpawns[i].position, Quaternion.identity);
+            Vector3 spawnOffset = new Vector3(Random.Range(-1.5f, 1.5f), 0, Random.Range(-1.5f, 1.5f));
+
+            Vector3 spawnPosition = extraBotSpawns[i].position + spawnOffset;
+
+            Debug.Log($"Spawning extra bot at position {spawnPosition}");
+
+            GameObject newBot = Instantiate(bot, spawnPosition, Quaternion.identity);
             extraBots.Add(newBot);
+
+            var botAI = newBot.GetComponent<BotsController>();
+            if (botAI != null)
+            {
+                var config = LevelGenerator.levels[currentLevel];
+                int aiLevel = Mathf.Clamp(config.levelIndex, 0, 9);
+                botAI.SetAILevel(aiLevel);
+            }
+            else
+            {
+                Debug.LogWarning("Spawned bot does not have BotsController component!");
+            }
+
+            var health = newBot.GetComponent<HealthCharacter>();
+            if (health != null)
+            {
+                health.ResetHealth();
+            }
+            else
+            {
+                Debug.LogWarning("Spawned bot does not have HealthCharacter component!");
+            }
         }
+
     }
 
     private void ClearExtraBots()
@@ -117,7 +159,6 @@ public class GameManager : MonoBehaviour
         }
         extraBots.Clear();
     }
-
     private void StartLevel()
     {
         if (LevelGenerator.levels == null || LevelGenerator.levels.Count == 0)
@@ -135,11 +176,20 @@ public class GameManager : MonoBehaviour
         var config = LevelGenerator.levels[currentLevel];
         Debug.Log($"⚔️ Starting Level {config.levelIndex}");
 
-        var botAI = bot.GetComponent<BotsController>();
-
         int aiLevel = Mathf.Clamp(config.levelIndex, 0, 9);
-        botAI.SetAILevel(aiLevel);
+
+        var botAI = bot.GetComponent<BotsController>();
+        if (botAI != null)
+            botAI.SetAILevel(aiLevel);
+
+        foreach (var extraBot in extraBots)
+        {
+            var botExtraAI = extraBot.GetComponent<BotsController>();
+            if (botExtraAI != null)
+                botExtraAI.SetAILevel(aiLevel);
+        }
     }
+
 
     public static void EndGame()
     {
@@ -155,7 +205,6 @@ public class GameManager : MonoBehaviour
             Debug.LogError("GameManager.Instance is null. Make sure GameManager is in the scene!");
         }
     }
-
     private IEnumerator NextRoundAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -173,6 +222,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("🎉 All levels complete!");
         }
     }
+
 
     public void ResetCharacters()
     {

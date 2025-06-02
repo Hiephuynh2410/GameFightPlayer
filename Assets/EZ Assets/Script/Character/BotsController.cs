@@ -61,7 +61,8 @@ public class BotsController : MonoBehaviour
         else
             Debug.LogWarning("Player not found! Add tag 'Player' to player object.");
     }
-  
+
+    
 
     private void FixedUpdate()
     {
@@ -136,16 +137,25 @@ public class BotsController : MonoBehaviour
     private IEnumerator AutoComboAttack()
     {
         string[] attackTriggers = { "Punch1", "Hit1" };
+        HealthCharacter playerHealth = playerTransform?.GetComponent<HealthCharacter>();
+
+        float initialDelay = Random.Range(0.5f, 2.0f);
+        yield return new WaitForSeconds(initialDelay);
+
         while (true)
         {
             if (health != null && health.isDead) yield break;
+            if (playerHealth == null || playerHealth.isDead) yield break;
 
-            currentAttack = attackTriggers[Random.Range(0, attackTriggers.Length)];
+            string currentAttack = attackTriggers[Random.Range(0, attackTriggers.Length)];
             animator.SetTrigger(currentAttack);
 
-            yield return new WaitForSeconds(attackFrequency);
+            float nextDelay = Random.Range(attackFrequency * 0.8f, attackFrequency * 1.2f);
+            yield return new WaitForSeconds(nextDelay);
         }
     }
+
+
 
     public void EnableHit()
     {

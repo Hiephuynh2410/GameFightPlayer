@@ -420,7 +420,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7261242707295482924, guid: 6b70020613252437e9ec0cec794c0861, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -844,13 +845,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.33589664, y: -0.0134358015, z: 0.00009818238, w: 0.94180304}
-  m_LocalPosition: {x: -1.07, y: 5.4, z: -4.41}
+  m_LocalRotation: {x: 0.4158209, y: -0.013377341, z: 0.0012558516, w: 0.9093473}
+  m_LocalPosition: {x: 1.08, y: 5.38, z: -4.36}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 39.25, y: -1.868, z: -0.654}
+  m_LocalEulerAnglesHint: {x: 49.138, y: -2.04, z: -0.774}
 --- !u!1 &1003108626
 GameObject:
   m_ObjectHideFlags: 0
@@ -883,10 +884,11 @@ MonoBehaviour:
   currentLevel: 0
   player: {fileID: 952757913}
   bot: {fileID: 79925166}
-  botPrefab: {fileID: 7421653487955196459, guid: 775cd3b427d63974d8703d8fc87cc3ce, type: 3}
   playerSpawn: {fileID: 952757923}
   botSpawn: {fileID: 79925172}
-  extraBotSpawns: []
+  extraBotSpawns:
+  - {fileID: 8025268549861323299, guid: a389451827f7c29409b3feb7eb971647, type: 3}
+  - {fileID: 7905174323926392977, guid: 775cd3b427d63974d8703d8fc87cc3ce, type: 3}
   menuUI: {fileID: 238036669}
 --- !u!4 &1003108628
 Transform:
@@ -1043,6 +1045,7 @@ MonoBehaviour:
   moveSpeed: 5
   ringCenter: {x: 0, y: 0, z: 0}
   ringRadius: 7
+  rb: {fileID: 0}
 --- !u!1 &1326933562
 GameObject:
   m_ObjectHideFlags: 0

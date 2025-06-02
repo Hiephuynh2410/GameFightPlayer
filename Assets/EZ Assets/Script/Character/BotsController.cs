@@ -32,36 +32,35 @@ public class BotsController : MonoBehaviour
 
     private string currentAttack = "";
 
-private void Start()
-{
-    rb = GetComponent<Rigidbody>();
-    animator = GetComponent<Animator>();
-    health = GetComponent<HealthCharacter>();
-
-    if (rb == null)
-        Debug.LogWarning("No Rigidbody component found on " + gameObject.name);
-    else
+    private void Start()
     {
-        rb.freezeRotation = true;
-        rb.isKinematic = true;
+        rb = GetComponent<Rigidbody>();
+        animator = GetComponent<Animator>();
+        health = GetComponent<HealthCharacter>();
+
+        if (rb == null)
+            Debug.LogWarning("No Rigidbody component found on " + gameObject.name);
+        else
+        {
+            rb.freezeRotation = true;
+            rb.isKinematic = true;
+        }
+
+        if (animator == null)
+            Debug.LogWarning("No Animator component found on " + gameObject.name);
+
+        if (hitCollider != null)
+        {
+            hitCollider.enabled = false;
+            hitCollider.isTrigger = true;
+        }
+
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+            playerTransform = player.transform;
+        else
+            Debug.LogWarning("Player not found! Add tag 'Player' to player object.");
     }
-
-    if (animator == null)
-        Debug.LogWarning("No Animator component found on " + gameObject.name);
-
-    if (hitCollider != null)
-    {
-        hitCollider.enabled = false;
-        hitCollider.isTrigger = true;
-    }
-
-    GameObject player = GameObject.FindGameObjectWithTag("Player");
-    if (player != null)
-        playerTransform = player.transform;
-    else
-        Debug.LogWarning("Player not found! Add tag 'Player' to player object.");
-}
-
   
 
     private void FixedUpdate()

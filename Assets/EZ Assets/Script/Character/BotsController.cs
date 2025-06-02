@@ -1,10 +1,9 @@
-
-
 using UnityEngine;
 using System.Collections;
 
 public class BotsController : MonoBehaviour
 {
+    [Header("Movement & AI Settings")]
     public float moveSpeed = 3f;
     public float stoppingDistance = 2f;
     public float evadeDistance = 1.0f;
@@ -18,14 +17,17 @@ public class BotsController : MonoBehaviour
     private Coroutine comboCoroutine;
     private bool inAttackRange = false;
 
-
+    [Header("Ring Settings")]
     public Vector3 ringCenter = Vector3.zero;
     public float ringRadius = 5f;
 
+    [Header("Hit Settings")]
     public Collider hitCollider;
+
+    [Header("AI Level Settings")]
     public int aiLevel = 0;
 
-    // DAMAGE SETTINGS
+    [Header("Damage Settings")]
     public int punch1Damage = 10;
     public int hit1Damage = 10;
     public int uppercutDamage = 30;
@@ -39,7 +41,9 @@ public class BotsController : MonoBehaviour
         health = GetComponent<HealthCharacter>();
 
         if (rb == null)
+        {
             Debug.LogWarning("No Rigidbody component found on " + gameObject.name);
+        }
         else
         {
             rb.freezeRotation = true;
@@ -47,29 +51,34 @@ public class BotsController : MonoBehaviour
         }
 
         if (animator == null)
+        {
             Debug.LogWarning("No Animator component found on " + gameObject.name);
+        }
 
         if (hitCollider != null)
         {
             hitCollider.enabled = false;
             hitCollider.isTrigger = true;
         }
+        else
+        {
+            Debug.LogWarning("HitCollider is not assigned on " + gameObject.name);
+        }
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
             playerTransform = player.transform;
         else
-            Debug.LogWarning("Player not found! Add tag 'Player' to player object.");
+            Debug.LogWarning("Player not found! Please add tag 'Player' to player object.");
     }
-
-    
 
     private void FixedUpdate()
     {
-        if (rb == null || playerTransform == null || (health != null && health.isDead)) return;
+        if (rb == null || playerTransform == null || (health != null && health.isDead))
+            return;
 
         Vector3 directionToPlayer = playerTransform.position - rb.position;
-        directionToPlayer.y = 0;
+        directionToPlayer.y = 0; 
         float distance = directionToPlayer.magnitude;
 
         if (distance < 0.5f)
@@ -85,10 +94,10 @@ public class BotsController : MonoBehaviour
         if (distance <= evadeDistance)
         {
             Vector3 evadeDir = Vector3.Cross(moveDir, Vector3.up).normalized;
-            if (Random.value > 0.5f)
-                evadeDir = -evadeDir;
+            evadeDir = (Random.value > 0.5f) ? evadeDir : -evadeDir;
 
             newPosition = rb.position + evadeDir * moveSpeed * Time.fixedDeltaTime;
+
             StopComboIfRunning();
             inAttackRange = false;
         }
@@ -104,16 +113,15 @@ public class BotsController : MonoBehaviour
         else
         {
             newPosition = rb.position + moveDir * moveSpeed * Time.fixedDeltaTime;
+
             StopComboIfRunning();
             inAttackRange = false;
         }
-
-        // Giới hạn trong sàn đấu
         Vector3 offsetFromCenter = newPosition - ringCenter;
         if (offsetFromCenter.magnitude > ringRadius)
         {
-            moveDir = (ringCenter - rb.position).normalized;
-            newPosition = rb.position + moveDir * moveSpeed * Time.fixedDeltaTime;
+            Vector3 toCenterDir = (ringCenter - rb.position).normalized;
+            newPosition = rb.position + toCenterDir * moveSpeed * Time.fixedDeltaTime;
         }
 
         rb.MovePosition(newPosition);
@@ -147,7 +155,7 @@ public class BotsController : MonoBehaviour
             if (health != null && health.isDead) yield break;
             if (playerHealth == null || playerHealth.isDead) yield break;
 
-            string currentAttack = attackTriggers[Random.Range(0, attackTriggers.Length)];
+            currentAttack = attackTriggers[Random.Range(0, attackTriggers.Length)];
             animator.SetTrigger(currentAttack);
 
             float nextDelay = Random.Range(attackFrequency * 0.8f, attackFrequency * 1.2f);
@@ -155,14 +163,13 @@ public class BotsController : MonoBehaviour
         }
     }
 
-
-
     public void EnableHit()
     {
         if (hitCollider != null)
             hitCollider.enabled = true;
     }
 
+    // Vô hiệu hitbox khi animation gọi
     public void DisableHit()
     {
         if (hitCollider != null)
@@ -189,11 +196,12 @@ public class BotsController : MonoBehaviour
         {
             case "Punch1": return punch1Damage;
             case "Hit1": return hit1Damage;
-            // case "Uppercut": return uppercutDamage;
+            case "Uppercut": return uppercutDamage;
             default: return 10;
         }
     }
 
+    // Thiết lập AI level và cập nhật thuộc tính tương ứng
     public void SetAILevel(int level)
     {
         aiLevel = level;
@@ -278,9 +286,11 @@ public class BotsController : MonoBehaviour
                 evadeDistance = 0.5f;
                 break;
         }
+
         UpdateHitboxDamage(punch1Damage);
-        Debug.Log($"{gameObject.name} AI Level set to {level} | Speed: {moveSpeed}, Freq: {attackFrequency}, Damage: {punch1Damage}");
-    }   
+
+        Debug.Log($"{gameObject.name} AI Level set to {level} | Speed: {moveSpeed}, Attack Frequency: {attackFrequency}, Damage: {punch1Damage}");
+    }
 
     private void UpdateHitboxDamage(int damage)
     {
@@ -291,5 +301,4 @@ public class BotsController : MonoBehaviour
             Debug.Log($"[BotsController] Set HitDetector damage to {damage} on {hitDetector.gameObject.name}");
         }
     }
-
 }

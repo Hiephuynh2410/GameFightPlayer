@@ -199,96 +199,22 @@ public class BotsController : MonoBehaviour
             default: return 10;
         }
     }
-
-    // Thiết lập AI level và cập nhật thuộc tính tương ứng
     public void SetAILevel(int level)
     {
-        aiLevel = level;
+        aiLevel = Mathf.Clamp(level, 0, 10);
+        moveSpeed = 1.0f + aiLevel * 0.2f;
 
-        switch (level)
-        {
-            case 0:
-                moveSpeed = 1.0f;
-                attackFrequency = 1f;
-                punch1Damage = 1;
-                hit1Damage = 1;
-                evadeDistance = 0.2f;
-                break;
-            case 1:
-                moveSpeed = 2.5f;
-                attackFrequency = 1.3f;
-                punch1Damage = 8;
-                hit1Damage = 8;
-                evadeDistance = 0.4f;
-                break;
-            case 2:
-                moveSpeed = 3.0f;
-                attackFrequency = 1.1f;
-                punch1Damage = 11;
-                hit1Damage = 11;
-                evadeDistance = 0.6f;
-                break;
-            case 3:
-                moveSpeed = 3.5f;
-                attackFrequency = 0.95f;
-                punch1Damage = 14;
-                hit1Damage = 14;
-                evadeDistance = 0.8f;
-                break;
-            case 4:
-                moveSpeed = 4.0f;
-                attackFrequency = 0.8f;
-                punch1Damage = 17;
-                hit1Damage = 17;
-                evadeDistance = 1.0f;
-                break;
-            case 5:
-                moveSpeed = 4.5f;
-                attackFrequency = 0.7f;
-                punch1Damage = 20;
-                hit1Damage = 20;
-                evadeDistance = 1.1f;
-                break;
-            case 6:
-                moveSpeed = 5.0f;
-                attackFrequency = 0.6f;
-                punch1Damage = 24;
-                hit1Damage = 24;
-                evadeDistance = 1.2f;
-                break;
-            case 7:
-                moveSpeed = 5.5f;
-                attackFrequency = 0.5f;
-                punch1Damage = 28;
-                hit1Damage = 28;
-                evadeDistance = 1.3f;
-                break;
-            case 8:
-                moveSpeed = 6.0f;
-                attackFrequency = 0.4f;
-                punch1Damage = 32;
-                hit1Damage = 32;
-                evadeDistance = 1.4f;
-                break;
-            case 9:
-                moveSpeed = 6.5f;
-                attackFrequency = 0.3f;
-                punch1Damage = 36;
-                hit1Damage = 36;
-                evadeDistance = 1.5f;
-                break;
-            default:
-                moveSpeed = 2f;
-                attackFrequency = 1f;
-                punch1Damage = 10;
-                hit1Damage = 10;
-                evadeDistance = 0.5f;
-                break;
-        }
+        attackFrequency = Mathf.Max(1.0f - aiLevel * 0.07f, 0.3f);
+
+        punch1Damage = 1 + aiLevel * 5;
+
+        evadeDistance = 0.2f + aiLevel * 0.15f;
+
+        hit1Damage = punch1Damage;
 
         UpdateHitboxDamage(punch1Damage);
 
-        Debug.Log($"{gameObject.name} AI Level set to {level} | Speed: {moveSpeed}, Attack Frequency: {attackFrequency}, Damage: {punch1Damage}");
+        Debug.Log($"{gameObject.name} AI Level set to {aiLevel} | Speed: {moveSpeed}, Attack Frequency: {attackFrequency}, Damage: {punch1Damage}, Evade Distance: {evadeDistance}");
     }
 
     private void UpdateHitboxDamage(int damage)

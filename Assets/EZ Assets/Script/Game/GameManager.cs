@@ -89,16 +89,22 @@ public class GameManager : MonoBehaviour
 
         ClearExtraBots();
 
+        int botCount = 0;
+
         switch (selectedMode)
         {
             case GameMode.OneVsMany:
-                Debug.Log("Spawning 2 extra bots");
-                SpawnExtraBots(2);
+                botCount = Mathf.Min(2, extraBotSpawns.Length);
                 break;
             case GameMode.ManyVsMany:
-                Debug.Log("Spawning 3 extra bots");
-                SpawnExtraBots(3);
+                botCount = extraBotSpawns.Length;
                 break;
+        }
+
+        if (botCount > 0)
+        {
+            Debug.Log($"Spawning {botCount} extra bots");
+            SpawnExtraBots(botCount);
         }
 
         player.GetComponent<PlayersController>().RestartAutoCombo();
@@ -109,6 +115,7 @@ public class GameManager : MonoBehaviour
     private void SpawnExtraBots(int count)
     {
         Debug.Log($"SpawnExtraBots called with count = {count}");
+
         if (extraBotSpawns == null || extraBotSpawns.Length == 0)
         {
             Debug.LogError("extraBotSpawns is empty! Please assign spawn points in Inspector.");
@@ -118,7 +125,6 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < count && i < extraBotSpawns.Length; i++)
         {
             Vector3 spawnOffset = new Vector3(Random.Range(-1.5f, 1.5f), 0, Random.Range(-1.5f, 1.5f));
-
             Vector3 spawnPosition = extraBotSpawns[i].position + spawnOffset;
 
             Debug.Log($"Spawning extra bot at position {spawnPosition}");
@@ -133,23 +139,15 @@ public class GameManager : MonoBehaviour
                 int aiLevel = Mathf.Clamp(config.levelIndex, 0, 9);
                 botAI.SetAILevel(aiLevel);
             }
-            else
-            {
-                Debug.LogWarning("Spawned bot does not have BotsController component!");
-            }
 
             var health = newBot.GetComponent<HealthCharacter>();
             if (health != null)
             {
                 health.ResetHealth();
             }
-            else
-            {
-                Debug.LogWarning("Spawned bot does not have HealthCharacter component!");
-            }
         }
-
     }
+
 
     private void ClearExtraBots()
     {

@@ -169,7 +169,6 @@ public class BotsController : MonoBehaviour
             hitCollider.enabled = true;
     }
 
-    // Vô hiệu hitbox khi animation gọi
     public void DisableHit()
     {
         if (hitCollider != null)
